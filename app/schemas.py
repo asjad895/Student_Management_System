@@ -10,7 +10,11 @@ class StudentCreate(BaseModel):
     age: int
     address: Address
 
+class Addressupdate(BaseModel):
+    city:Optional[str] = None
+    country:Optional[str] = None
+
 class StudentUpdate(BaseModel):
-    name: Optional[str]
-    age: Optional[int]
-    address: Optional[Address]
+    name: Optional[str] = None
+    age: Optional[int]  = None
+    address: Optional[Addressupdate] = None

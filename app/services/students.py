@@ -2,6 +2,7 @@ from app.db import db
 from app.models import student_helper
 from bson import ObjectId
 import traceback
+from fastapi import HTTPException
 
 async def create_student(data: dict) -> str:
     try:
@@ -29,6 +30,9 @@ async def get_student_by_id(student_id: str) -> dict:
 
 async def update_student(student_id: str, data: dict) -> bool:
     try:
+        if not ObjectId(student_id):
+            raise HTTPException(status_code=400,detail='Invalid id format')
+        
         result = await db["students"].update_one({"_id": ObjectId(student_id)}, {"$set": data})
         print(f"Successfully modified data for id > {student_id}, data > {data}")
         return result.modified_count > 0
