@@ -36,8 +36,7 @@ async def update_student(student_id: str, data: Dict) -> Union[bool,Dict]:
     try:
         
         result = await db["students"].update_one({"_id": ObjectId(student_id)}, {"$set": data})
-
-        # print(f"Successfully modified data for id > {student_id}, data > {data}")
+        print(result)
 
         return result
     except Exception as e:
@@ -48,7 +47,7 @@ async def update_student(student_id: str, data: Dict) -> Union[bool,Dict]:
 async def delete_student(student_id: str) -> Union[bool,Dict]:
     try:
         result = await db["students"].delete_one({"_id": ObjectId(student_id)})
-        print(f"data for id to delete> {student_id}")
+        print(f"id to delete> {student_id}")
         return result.deleted_count > 0
     except Exception as e:
         print(traceback.format_exception(e))

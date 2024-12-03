@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.schemas import StudentCreate, StudentUpdate
 from app.services.students import create_student, get_students, get_student_by_id, update_student, delete_student
 from bson import ObjectId
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse,Response
 
 router = APIRouter()
 
@@ -68,6 +68,7 @@ async def update_student_endpoint(id: str, student: StudentUpdate):
         raise HTTPException(status_code=400, detail=f"'{id}' is not a valid ObjectId.")
     
     update_data = student.model_dump(exclude_unset=True)
+    print(update_data)
 
     if not update_data:
         raise HTTPException(status_code=400, detail="No data provided to update.")
@@ -79,14 +80,13 @@ async def update_student_endpoint(id: str, student: StudentUpdate):
 
     if update_result is None:
         raise HTTPException(status_code=404, detail="Student not found.")
-    
     if update_result.matched_count == 1 and update_result.modified_count == 0:
         return JSONResponse(
             content={"message": f"No changes made as the provided data is identical to the existing information.\n{update_data}"},
             status_code=200,
         )
 
-    # return JSONResponse(content={"message": "Student updated successfully."}, status_code=200)
+    return Response(status_code=204)
 
 
 @router.delete("/{id}", response_model=dict, status_code=200)
@@ -103,4 +103,4 @@ async def delete_student_endpoint(id: str):
     
     if not deleted:
         raise HTTPException(status_code=404, detail="Student not found.")
-    return JSONResponse(content={"message": "Student deleted successfully."}, status_code=200)
+    return Response(status_code=204)
