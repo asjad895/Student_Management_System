@@ -18,7 +18,7 @@ async def create_student_endpoint(student: StudentCreate):
         if isinstance(response,dict) and 'error' in response:
             return JSONResponse(status_code=500,content=response)
         # id
-        return JSONResponse(content={"message": "Student created successfully.", "id": response}, status_code=201)
+        return JSONResponse(content={"id": response}, status_code=201)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating student: {str(e)}")
 
@@ -39,7 +39,7 @@ async def list_students(country: str = None, age: int = None):
     if isinstance(response,dict) and 'error' in response:
         return JSONResponse(status_code=500,content=response)
     # students
-    return JSONResponse(content={"students": response}, status_code=200)
+    return JSONResponse(content=response, status_code=200)
 
 
 @router.get("/{id}", response_model=dict)
@@ -86,7 +86,7 @@ async def update_student_endpoint(id: str, student: StudentUpdate):
             status_code=200,
         )
 
-    return JSONResponse(content={"message": "Student updated successfully."}, status_code=200)
+    # return JSONResponse(content={"message": "Student updated successfully."}, status_code=200)
 
 
 @router.delete("/{id}", response_model=dict, status_code=200)
