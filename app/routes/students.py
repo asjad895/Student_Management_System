@@ -13,8 +13,12 @@ async def create_student_endpoint(student: StudentCreate):
     Create a new student.
     """
     try:
-        student_id = await create_student(student.model_dump())
-        return JSONResponse(content={"message": "Student created successfully.", "id": student_id}, status_code=201)
+        response = await create_student(student.model_dump())
+        # error
+        if isinstance(response,dict) and 'error' in response:
+            return JSONResponse(status_code=500,content=response)
+        # id
+        return JSONResponse(content={"message": "Student created successfully.", "id": response}, status_code=201)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating student: {str(e)}")
 
@@ -30,8 +34,12 @@ async def list_students(country: str = None, age: int = None):
     if age:
         filters["age"] = {"$gte": age}
 
-    students = await get_students(filters)
-    return JSONResponse(content={"students": students}, status_code=200)
+    response = await get_students(filters)
+    # error
+    if isinstance(response,dict) and 'error' in response:
+        return JSONResponse(status_code=500,content=response)
+    # students
+    return JSONResponse(content={"students": response}, status_code=200)
 
 
 @router.get("/{id}", response_model=dict)
@@ -41,10 +49,14 @@ async def fetch_student(id: str):
     """
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=400, detail=f"'{id}' is not a valid ObjectId.")
-    student = await get_student_by_id(id)
-    if not student:
+    response = await get_student_by_id(id)
+    # error
+    if isinstance(response,dict) and 'error' in response:
+        return JSONResponse(status_code=500,content=response)
+    # students
+    if not response:
         raise HTTPException(status_code=404, detail="Student not found.")
-    return JSONResponse(content=student, status_code=200)
+    return JSONResponse(content=response, status_code=200)
 
 
 @router.patch("/{id}", response_model=dict, status_code=200)
@@ -61,6 +73,9 @@ async def update_student_endpoint(id: str, student: StudentUpdate):
         raise HTTPException(status_code=400, detail="No data provided to update.")
 
     update_result = await update_student(id, update_data)
+    # error
+    if isinstance(update_result,dict) and 'error' in update_result:
+            return JSONResponse(status_code=500,content=update_result)
 
     if update_result is None:
         raise HTTPException(status_code=404, detail="Student not found.")
@@ -82,6 +97,10 @@ async def delete_student_endpoint(id: str):
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=400, detail=f"'{id}' is not a valid ObjectId.")
     deleted = await delete_student(id)
+    # error
+    if isinstance(deleted,dict) and 'error' in deleted:
+        return JSONResponse(status_code=500,content=deleted)
+    
     if not deleted:
         raise HTTPException(status_code=404, detail="Student not found.")
     return JSONResponse(content={"message": "Student deleted successfully."}, status_code=200)
