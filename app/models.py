@@ -1,6 +1,6 @@
-from bson import ObjectId
+from typing import Dict
 
-def student_helper(student) -> dict:
+def student_helper(student) -> Dict:
     return {
         "id": str(student["_id"]),
         "name": student["name"],
