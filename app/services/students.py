@@ -30,14 +30,12 @@ async def get_student_by_id(student_id: str) -> dict:
 
 async def update_student(student_id: str, data: dict) -> bool:
     try:
-        if not ObjectId(student_id):
-            raise HTTPException(status_code=400,detail='Invalid id format')
         
         result = await db["students"].update_one({"_id": ObjectId(student_id)}, {"$set": data})
 
-        print(f"Successfully modified data for id > {student_id}, data > {data}")
-        
-        return result.modified_count > 0
+        # print(f"Successfully modified data for id > {student_id}, data > {data}")
+
+        return result
     except Exception as e:
         print(traceback.format_exception(e))
 
